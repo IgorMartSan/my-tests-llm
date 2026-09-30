@@ -1,0 +1,99 @@
+services:
+
+# Teste:
+# curl http://localhost:8072/v1/chat/completions \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "model": "gemma4",
+#     "messages": [
+#       {"role": "user", "content": "Explique em português o que é Docker em duas frases."}
+#     ],
+#     "max_tokens": 128
+#   }'
+
+# VRAM usada: 14.292 MiB ≈ 13,96 GiB
+# VRAM total: 16.303 MiB ≈ 15,92 GiB
+
+
+  gemma4:
+    image: vllm/vllm-openai:latest
+    container_name: gemma4
+    restart: unless-stopped
+
+    runtime: nvidia
+
+    ports:
+      - "8072:8000"
+
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+    volumes:
+      - .volumes/gemma4/hf-cache:/root/.cache/huggingface
+
+    ipc: host
+
+    command:
+      - --model
+      - google/gemma-4-E4B-it-qat-w4a16-ct
+
+      - --host
+      - 0.0.0.0
+
+      - --port
+      - "8000"
+
+      - --dtype
+      - half
+
+      - --gpu-memory-utilization
+      - "0.90"
+
+      #- --max-model-len
+      #- "4096"
+
+      - --max-num-seqs
+      - "1"
+
+      - --max-num-batched-tokens
+      - "4096"
+
+      - --served-model-name
+      - gemma4
+
+      - --enable-auto-tool-choice
+
+      - --tool-call-parser
+      - gemma4
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+
+  laya:
+    image: ghcr.io/cloudn1ne/system1:latest
+
+    ports:
+      - "8003:8000"
+
+    environment:
+      LAYA_DEVICE: cuda
+      LAYA_PRELOAD: "1"
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
