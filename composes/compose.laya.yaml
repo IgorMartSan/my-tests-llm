@@ -1,0 +1,20 @@
+  
+services:
+  laya:
+    image: ghcr.io/cloudn1ne/system1:latest
+
+    ports:
+      - "8003:8000"
+
+    environment:
+      LAYA_DEVICE: cuda
+      LAYA_PRELOAD: "1"
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
