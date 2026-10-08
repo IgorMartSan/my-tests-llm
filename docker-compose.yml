@@ -1,6 +1,6 @@
 include:
-  - compose.gemma4.yaml
-  - compose.laya.yaml
+  - ./composes/compose.gemma.yaml
+  - ./composes/compose.laya.yaml
 
 
 networks:
