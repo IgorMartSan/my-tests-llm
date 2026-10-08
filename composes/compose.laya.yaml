@@ -1,7 +1,10 @@
-  
 services:
+
+#1532 MiB ≈ 1,50 GiB
   laya:
     image: ghcr.io/cloudn1ne/system1:latest
+    container_name: laya-multilingual
+    restart: unless-stopped
 
     ports:
       - "8003:8000"
@@ -9,6 +12,8 @@ services:
     environment:
       LAYA_DEVICE: cuda
       LAYA_PRELOAD: "1"
+      LAYA_MODEL: multilingual
+      LAYA_MODELS: multilingual
 
     deploy:
       resources:
@@ -16,5 +21,4 @@ services:
           devices:
             - driver: nvidia
               count: 1
-              capabilities:
-                - gpu
+              capabilities: [gpu]
