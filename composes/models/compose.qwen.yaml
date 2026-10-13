@@ -1,0 +1,66 @@
+services:
+
+
+#Com essa configuração, a estimativa é:
+#- Arquivo do modelo: 19,5–21 GB
+#- KV cache Q8 para 131072 tokens: aproximadamente 4,5–5 GB
+#- Overhead do llama.cpp/CUDA: aproximadamente 2–4 GB
+
+
+  qwen:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    container_name: qwen3_8_27b
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:38471:8080"
+
+    volumes:
+      - ../../volumes/qwen:/models:ro
+
+    environment:
+      NVIDIA_VISIBLE_DEVICES: "0"
+      NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+
+    gpus:
+      - driver: nvidia
+        count: 1
+        capabilities: [gpu]
+
+    command:
+      - "--model"
+      - "/models/Qwen3.8-27B-Q5_K_M.gguf"
+
+      - "--alias"
+      - "qwen-27b"
+
+      - "--host"
+      - "0.0.0.0"
+
+      - "--port"
+      - "8080"
+
+      # 128K tokens; depois pode testar 262144
+      - "--ctx-size"
+      - "131072"
+
+      - "--parallel"
+      - "1"
+
+      # Tenta colocar todas as camadas na GPU
+      - "--n-gpu-layers"
+      - "99"
+
+      # KV cache quantizado
+      - "--cache-type-k"
+      - "q8_0"
+
+      - "--cache-type-v"
+      - "q8_0"
+
+      # Melhor desempenho em contexto longo
+      - "--flash-attn"
+      - "on"
+
+      # Suporte a chat template e ferramentas
+      - "--jinja"

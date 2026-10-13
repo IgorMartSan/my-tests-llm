@@ -1,7 +1,13 @@
 include:
-  - ./composes/compose.gemma.yaml
-  - ./composes/compose.laya.yaml
+  #Models
+  - ./composes/models/compose.gemma.yaml
+  - ./composes/models/compose.laya.yaml
+  #Agents
+  # - ./composes
 
+  # Langfuse
+  - path: ./composes/langfuse/compose.langfuse.yaml
+    env_file: ./composes/langfuse/.env
 
 networks:
   agent_platform_network:

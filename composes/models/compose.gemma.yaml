@@ -11,8 +11,7 @@ services:
 #     "max_tokens": 128
 #   }'
 
-# VRAM usada: 14.292 MiB ≈ 13,96 GiB
-# VRAM total: 16.303 MiB ≈ 15,92 GiB
+
 
 # 12620 MiB ≈ 12,32 Gi
   gemma4:
@@ -33,7 +32,7 @@ services:
       - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
     volumes:
-      - ../volumes/gemma4/hf-cache:/root/.cache/huggingface
+      - ../../volumes/gemma4/hf-cache:/root/.cache/huggingface
 
     ipc: host
 

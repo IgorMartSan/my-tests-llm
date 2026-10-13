@@ -1,2 +1,45 @@
 *hf-cache
 *volumes
+.venv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Testes e cobertura
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Empacotamento e distribuição
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Type checkers e ferramentas
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Ambientes virtuais
+venv/
+env/
+ENV/
+
+# Arquivos temporários
+*.log
+*.tmp
+*.temp
+.DS_Store
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+!.env.example
