@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="4.713" timestamp="2026-10-19T13:36:25.110603-03:00" hostname="AUTOU3"><testcase classname="tests.evals.test_agent" name="test_agent[Qual \xe9 o seu nome?]" time="1.323"><failure message="AssertionError: The actual output states the agent's name is RSA, which directly contradicts the expected output that requires stating the agent's name is Igor Martins. This fails steps 1, 2, and 4 regarding factual and logical correctness.&#10;assert False&#10; +  where False = is_successful()&#10; +    where is_successful = &lt;deepeval.metrics.g_eval.g_eval.GEval object at 0x77ba588d3830&gt;.is_successful">golden = Golden(id=None, input='Qual é o seu nome?', actual_output=None, expected_output='Informar que o nome do agente é Igor ...me=None, custom_column_key_values=None, expectations=None, expected_labels=None, multimodal=False, images_mapping=None)
+agent_loop = &lt;_UnixSelectorEventLoop running=False closed=False debug=False&gt;
+
+    @pytest.mark.parametrize(
+        "golden",
+        dataset.goldens,
+        ids=lambda golden: golden.input,
+    )
+    def test_agent(golden, agent_loop):
+        # Executa o agente real
+        response = agent_loop.run_until_complete(
+            run_agent(
+                message=golden.input,
+                thread_id=str(uuid.uuid4()),
+                user_id="deepeval_test",
+            )
+        )
+    
+        # Registra pergunta, resposta e expectativa
+        test_case = LLMTestCase(
+            input=golden.input,
+            actual_output=response,
+            expected_output=golden.expected_output,
+        )
+    
+        # Configura o LLM avaliador
+        metric = GEval(
+            name="Qualidade da resposta",
+            criteria=("Avalie se a resposta atende ao comportamento esperado, é correta, clara e objetiva."),
+            evaluation_params=[
+                SingleTurnParams.ACTUAL_OUTPUT,
+                SingleTurnParams.EXPECTED_OUTPUT,
+            ],
+            threshold=0.8,
+            model=OpenAIModel(
+                model=os.getenv("LLM_MODEL", "gemma4"),
+                base_url=os.getenv("LLM_URL", "http://localhost:8072/v1"),
+                api_key=os.getenv("OPENAI_API_KEY", "local"),
+                temperature=0,
+            ),
+        )
+    
+        metric.measure(test_case)
+    
+        print(f"\nPergunta: {golden.input}")
+        print(f"Resposta do agente: {response}")
+        print(f"Nota do juiz: {metric.score}")
+        print(f"Justificativa do juiz: {metric.reason}")
+    
+&gt;       assert metric.is_successful(), metric.reason
+E       AssertionError: The actual output states the agent's name is RSA, which directly contradicts the expected output that requires stating the agent's name is Igor Martins. This fails steps 1, 2, and 4 regarding factual and logical correctness.
+E       assert False
+E        +  where False = is_successful()
+E        +    where is_successful = &lt;deepeval.metrics.g_eval.g_eval.GEval object at 0x77ba588d3830&gt;.is_successful
+
+tests/evals/test_agent.py:76: AssertionError</failure></testcase><testcase classname="tests.evals.test_agent" name="test_agent[Quem \xe9 voc\xea?]" time="1.523" /><testcase classname="tests.evals.test_agent" name="test_agent[O que voc\xea faz?]" time="1.531" /></testsuite></testsuites>

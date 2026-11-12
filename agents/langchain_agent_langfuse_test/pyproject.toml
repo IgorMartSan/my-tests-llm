@@ -21,11 +21,20 @@ line-length = 200
 
 [tool.ruff.format]
 line-ending = "auto"
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
 
 [dependency-groups]
 dev = [
+    "deepeval>=2.0.0",
+    "pytest>=8.0.0",
     "ruff>=0.17.0",
 ]
 
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

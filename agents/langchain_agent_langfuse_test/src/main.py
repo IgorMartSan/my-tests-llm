@@ -1,14 +1,11 @@
 import asyncio
 
-from langfuse import get_client, propagate_attributes
-from langfuse.langchain import CallbackHandler
-
-from agent import graph
-
-
 from dotenv import load_dotenv
 
 load_dotenv()
+
+from langfuse import get_client
+from src.service import run_agent
 
 
 async def main():
@@ -19,43 +16,14 @@ async def main():
 
     try:
         while True:
-            message = await asyncio.to_thread(
-                input,
-                "Você: ",
-            )
+            message = await asyncio.to_thread(input, "Você: ")
 
             if message.lower() in {"sair", "exit"}:
                 break
 
-            handler = CallbackHandler()
+            response = await run_agent(message=message, thread_id=conversation_id, user_id=user_id)
 
-            with propagate_attributes(
-                trace_name="langchain_agent_langfuse_test",
-                user_id=user_id,
-                session_id=conversation_id,
-                tags=["rsa", "langgraph"],
-            ):
-                result = await graph.ainvoke(
-                    {
-                        "messages": [
-                            {
-                                "role": "user",
-                                "content": message,
-                            }
-                        ]
-                    },
-                    config={
-                        "configurable": {
-                            "thread_id": conversation_id,
-                        },
-                        "callbacks": [handler],
-                    },
-                )
-
-            print(
-                "Agente:",
-                result["messages"][-1].content,
-            )
+            print("Agente:", response)
 
     finally:
         langfuse.flush()
